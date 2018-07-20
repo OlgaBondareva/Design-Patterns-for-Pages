@@ -38,7 +38,7 @@ public class YandexMailTests {
         driver.quit();
     }
 
-    @Test
+    @Test ()
     public void testLogin() {
         String baseURL = "https://yandex.by/";
         driver.get(baseURL);
@@ -46,7 +46,7 @@ public class YandexMailTests {
         Assert.assertTrue(mailBox.login(login, password), "Can't login into mail. ");
     }
 
-    @Test(dependsOnMethods = "testLogin")
+    @Test(priority = 1)
     public void testDraft() {
         mailBox.newMail(address, subject, body);
         mailBox.saveToDrafts();
@@ -54,14 +54,14 @@ public class YandexMailTests {
         Assert.assertTrue(mailBox.checkFolder(address, subject, body), "Can't find required message in draft folder. ");
     }
 
-    @Test(dependsOnMethods = {"testLogin", "testDraft"})
+    @Test(priority = 2)
     public void testEmptyDraftFolder() {
         mailBox.sendMailFromDraft(subject);
         mailBox.goToDraftFolder();
         Assert.assertFalse(mailBox.checkFolder(address, subject, body));
     }
 
-    @Test(dependsOnMethods = {"testLogin", "testDraft", "testEmptyDraftFolder"})
+    @Test(priority = 3)
     public void testSentFolder() {
         mailBox.goToSentFolder();
         Assert.assertTrue(mailBox.checkFolder(address, subject, body));
