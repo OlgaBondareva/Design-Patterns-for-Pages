@@ -51,17 +51,20 @@ public class YandexMailTests {
         mailBox.newMail();
         mailBox.setMailFields(address, subject, body);
         mailBox.saveToDrafts();
-        Assert.assertTrue(mailBox.checkDraftsFolder(address, subject, body), "Can't find required message in draft folder. ");
+        mailBox.goToDraftFolder();
+        Assert.assertTrue(mailBox.checkFolder(address, subject, body), "Can't find required message in draft folder. ");
     }
 
     @Test(dependsOnMethods = {"testLogin", "testDraft"})
     public void testEmptyDraftFolder() {
         mailBox.sendMailFromDraft(subject);
-        Assert.assertFalse(mailBox.checkDraftsFolder(address, subject, body));
+        mailBox.goToDraftFolder();
+        Assert.assertFalse(mailBox.checkFolder(address, subject, body));
     }
 
     @Test(dependsOnMethods = {"testLogin", "testDraft", "testEmptyDraftFolder"})
     public void testSentFolder() {
-        Assert.assertTrue(mailBox.checkSentFolder(address, subject, body));
+        mailBox.goToSentFolder();
+        Assert.assertTrue(mailBox.checkFolder(address, subject, body));
     }
 }

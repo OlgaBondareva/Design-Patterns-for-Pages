@@ -89,8 +89,15 @@ public class MailBox {
         return !driver.getTitle().equals(curURL);
     }
 
-    public boolean checkDraftsFolder(String address, String subject, String body) {
+    public void goToDraftFolder() {
         draftsFolderBtn.click();
+    }
+
+    public void goToSentFolder() {
+        sentFolderBtn.click();
+    }
+
+    public boolean checkFolder(String address, String subject, String body) {
         driver.navigate().refresh();
         Collection<WebElement> messagesList = driver.findElements(By.xpath("//div[@class='mail-MessageSnippet-Content']"));
         if (messagesList.isEmpty()) {
@@ -106,30 +113,6 @@ public class MailBox {
             if (message.findElement(By.xpath("//span[@class='mail-MessageSnippet-FromText']")).getAttribute("title").trim().equalsIgnoreCase(address) &&
                     message.findElement(By.xpath("//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_subject']/child::span")).getAttribute("title").trim().equals(subject) &&
                     message.findElement(By.xpath("//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_firstline js-message-snippet-firstline']/child::span")).getText().trim().equals(body)) {
-                mailFound = true;
-                break;
-            }
-        }
-        return mailFound;
-    }
-
-    public boolean checkSentFolder(String address, String subject, String body) {
-        sentFolderBtn.click();
-        driver.navigate().refresh();
-        Collection<WebElement> messagesList = driver.findElements(By.xpath("//div[@class='ns-view-container-desc mail-MessagesList js-messages-list']"));
-        if (messagesList.isEmpty()) {
-            return false;
-        }
-        Iterator<WebElement> i = messagesList.iterator();
-        boolean mailFound = false;
-
-        WebElement message;
-
-        while (i.hasNext()) {
-            message = i.next();
-            if (message.findElement(By.xpath("//span[@class='mail-MessageSnippet-FromText']")).getAttribute("title").trim().equalsIgnoreCase(address) &&
-                    message.findElement(By.xpath("//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_subject']/child::span")).getAttribute("title").trim().equals(subject) &&
-                    message.findElement(By.xpath("//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_firstline js-message-snippet-firstline']/child::span")).getAttribute("title").trim().equals(body)) {
                 mailFound = true;
                 break;
             }
