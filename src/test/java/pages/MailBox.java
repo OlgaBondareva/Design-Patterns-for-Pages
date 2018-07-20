@@ -4,28 +4,27 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
 public class MailBox {
 
-    private WebDriverWait wait;
     private WebDriver driver;
 
-    @FindBy(xpath = "//span[@class='mail-MessageSnippet-FromText']/child::span")
+/*    @FindBy(xpath = "//span[@class='mail-MessageSnippet-FromText']/child::span")
     private LinkedList<WebElement> addressesList;
 
     @FindBy(xpath = "//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_subject']/child::span")
     private LinkedList<WebElement> subjectList;
 
     @FindBy(xpath = "//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_firstline js-message-snippet-firstline']/child::span")
-    private LinkedList<WebElement> bodysList;
+    private LinkedList<WebElement> bodysList;*/
 
-    @FindBy(className = "ns-view-container-desc mail-MessagesList js-messages-list")
-    private Collection<WebElement> messagesList;
+    /*@FindBy(xpath = "//div[@class='ns-view-container-desc mail-MessagesList js-messages-list']")
+    private Collection<WebElement> messagesList;*/
 
     @FindBy(name = "to")
     private WebElement addressField;
@@ -46,13 +45,13 @@ public class MailBox {
     private WebElement newMailBtn;
 
     @FindBy(xpath = "//span[contains(text(),'Входящие')]")
-    private WebElement inboxBtn;
+    private WebElement inboxFolderBtn;
 
     @FindBy(xpath = "//span[contains(text(),'Черновики')]")
-    private WebElement draftsBtn;
+    private WebElement draftsFolderBtn;
 
     @FindBy(xpath = "//span[contains(text(),'Отправленные')]")
-    private WebElement sentBtn;
+    private WebElement sentFolderBtn;
 
     @FindBy(xpath = "//a[contains(text(),'Выйти')]")
     private WebElement logoffBtn;
@@ -76,84 +75,52 @@ public class MailBox {
         this.driver = driver;
     }
 
-    public WebDriver getDriver() {
-        return driver;
-    }
-
-    public void setDriver(WebDriver driver) {
-        this.driver = driver;
-    }
-
-    public MailBox newMail() {
+    public void newMail() {
         newMailBtn.click();
-        return this;
     }
 
-    public MailBox inbox() {
-        inboxBtn.click();
-        return this;
-    }
-
-    public MailBox drafts() {
-        draftsBtn.click();
-        return this;
-    }
-
-    public MailBox sent() {
-        sentBtn.click();
-        return this;
-    }
-
-    public MailBox logoff() {
+    public void logoff(String name) {
+        WebElement nameBtn = driver.findElement(By.xpath("//div[contains(text(),'" + name + "')]"));
+        nameBtn.click();
         logoffBtn.click();
-        return this;
     }
 
-    public MailBox setLogin(String value) {
+    public void setLogin(String value) {
         loginField.sendKeys(value);
-        return this;
     }
 
-    public MailBox setPassword(String value) {
+    public void setPassword(String value) {
         passField.sendKeys(value);
-        return this;
     }
 
-    public MailBox setFields(String login, String pass) {
+    public boolean login(String login, String pass) {
+        String curURL = driver.getCurrentUrl();
+        loginBtn.click();
         setLogin(login);
         setPassword(pass);
         loginCheckBox.click();
-        return this;
-    }
-
-    public MailBox submitForm() {
         logBtn.click();
-        return this;
-    }
-
-    public LoginPage setAndSubmit(String login, String pass) {
-        setFields(login, pass);
-        return submitForm();
-    }
-
-    public boolean checkLogin() {
-        return !driver.getTitle().equals(baseURL);
+        return !driver.getTitle().equals(curURL);
     }
 
     public boolean checkDraftsFolder(String address, String subject, String body) {
+        draftsFolderBtn.click();
         driver.navigate().refresh();
         // driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-        draftsBtn.click();
+        Collection<WebElement> messagesList = driver.findElements(By.xpath("//div[@class='mail-MessageSnippet-Content']"));
+        if (messagesList.isEmpty()) {
+            return false;
+        }
+
         Iterator<WebElement> i = messagesList.iterator();
         boolean mailFound = false;
-
         WebElement message;
 
         while (i.hasNext()) {
             message = i.next();
-            if (message.findElement(By.xpath("//span[@class='mail-MessageSnippet-FromText']/child::span")).getAttribute("title").equals(address) &&
-                    message.findElement(By.xpath("//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_subject']/child::span")).getAttribute("title").equals(subject) &&
-                    message.findElement(By.xpath("//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_firstline js-message-snippet-firstline']/child::span")).getAttribute("title").equals(body)) {
+            if (message.findElement(By.xpath("//span[@class='mail-MessageSnippet-FromText']")).getAttribute("title").trim().equalsIgnoreCase(address) &&
+                    message.findElement(By.xpath("//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_subject']/child::span")).getAttribute("title").trim().equals(subject) &&
+                    message.findElement(By.xpath("//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_firstline js-message-snippet-firstline']/child::span")).getText().trim().equals(body)) {
                 mailFound = true;
                 break;
             }
@@ -162,9 +129,13 @@ public class MailBox {
     }
 
     public boolean checkSentFolder(String address, String subject, String body) {
+        sentFolderBtn.click();
         driver.navigate().refresh();
         // driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-        sentBtn.click();
+        Collection<WebElement> messagesList = driver.findElements(By.xpath("//div[@class='ns-view-container-desc mail-MessagesList js-messages-list']"));
+        if (messagesList.isEmpty()) {
+            return false;
+        }
         Iterator<WebElement> i = messagesList.iterator();
         boolean mailFound = false;
 
@@ -172,9 +143,9 @@ public class MailBox {
 
         while (i.hasNext()) {
             message = i.next();
-            if (message.findElement(By.xpath("//span[@class='mail-MessageSnippet-FromText']/child::span")).getAttribute("title").equals(address) &&
-                    message.findElement(By.xpath("//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_subject']/child::span")).getAttribute("title").equals(subject) &&
-                    message.findElement(By.xpath("//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_firstline js-message-snippet-firstline']/child::span")).getAttribute("title").equals(body)) {
+            if (message.findElement(By.xpath("//span[@class='mail-MessageSnippet-FromText']")).getAttribute("title").trim().equalsIgnoreCase(address) &&
+                    message.findElement(By.xpath("//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_subject']/child::span")).getAttribute("title").trim().equals(subject) &&
+                    message.findElement(By.xpath("//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_firstline js-message-snippet-firstline']/child::span")).getAttribute("title").trim().equals(body)) {
                 mailFound = true;
                 break;
             }
@@ -182,20 +153,24 @@ public class MailBox {
         return mailFound;
     }
 
-    public MailBox setFields(String address, String subject, String body) {
+    public void setMailFields(String address, String subject, String body) {
         addressField.sendKeys(address);
         subjectField.sendKeys(subject);
         bodyField.sendKeys(body);
-        return this;
     }
 
-    public MailBox saveToDrafts() {
-        inboxBtn.click();
+    public void saveToDrafts() {
+        // driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+        inboxFolderBtn.click();
         saveBtn.click();
-        return this;
     }
 
-    public MailBox sendMailFromDraft() {
-
+    public void sendMailFromDraft(String subject) {
+        draftsFolderBtn.click();
+        driver.navigate().refresh();
+        // driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+        WebElement draftMail = driver.findElement(By.xpath("//span[contains(text(), '" + subject + "')]"));
+        draftMail.click();
+        sendBtn.click();
     }
 }
