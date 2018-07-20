@@ -7,24 +7,10 @@ import org.openqa.selenium.support.FindBy;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
 
 public class MailBox {
 
     private WebDriver driver;
-
-/*    @FindBy(xpath = "//span[@class='mail-MessageSnippet-FromText']/child::span")
-    private LinkedList<WebElement> addressesList;
-
-    @FindBy(xpath = "//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_subject']/child::span")
-    private LinkedList<WebElement> subjectList;
-
-    @FindBy(xpath = "//span[@class='mail-MessageSnippet-Item mail-MessageSnippet-Item_firstline js-message-snippet-firstline']/child::span")
-    private LinkedList<WebElement> bodysList;*/
-
-    /*@FindBy(xpath = "//div[@class='ns-view-container-desc mail-MessagesList js-messages-list']")
-    private Collection<WebElement> messagesList;*/
 
     @FindBy(name = "to")
     private WebElement addressField;
@@ -106,7 +92,6 @@ public class MailBox {
     public boolean checkDraftsFolder(String address, String subject, String body) {
         draftsFolderBtn.click();
         driver.navigate().refresh();
-        // driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         Collection<WebElement> messagesList = driver.findElements(By.xpath("//div[@class='mail-MessageSnippet-Content']"));
         if (messagesList.isEmpty()) {
             return false;
@@ -131,7 +116,6 @@ public class MailBox {
     public boolean checkSentFolder(String address, String subject, String body) {
         sentFolderBtn.click();
         driver.navigate().refresh();
-        // driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         Collection<WebElement> messagesList = driver.findElements(By.xpath("//div[@class='ns-view-container-desc mail-MessagesList js-messages-list']"));
         if (messagesList.isEmpty()) {
             return false;
@@ -160,7 +144,6 @@ public class MailBox {
     }
 
     public void saveToDrafts() {
-        // driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         inboxFolderBtn.click();
         saveBtn.click();
     }
@@ -168,7 +151,6 @@ public class MailBox {
     public void sendMailFromDraft(String subject) {
         draftsFolderBtn.click();
         driver.navigate().refresh();
-        // driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         WebElement draftMail = driver.findElement(By.xpath("//span[contains(text(), '" + subject + "')]"));
         draftMail.click();
         sendBtn.click();
