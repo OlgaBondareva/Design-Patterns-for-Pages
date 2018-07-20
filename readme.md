@@ -1,4 +1,4 @@
-## WEBDRIVER BASICS  
+## DESIGN PATTERNS FOR PAGES (module 6)  
 ### Test scenario/flow:  
 *	Login to the mail box.  
 *	Assert, that the login is successful.  
