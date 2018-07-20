@@ -48,8 +48,7 @@ public class YandexMailTests {
 
     @Test(dependsOnMethods = "testLogin")
     public void testDraft() {
-        mailBox.newMail();
-        mailBox.setMailFields(address, subject, body);
+        mailBox.newMail(address, subject, body);
         mailBox.saveToDrafts();
         mailBox.goToDraftFolder();
         Assert.assertTrue(mailBox.checkFolder(address, subject, body), "Can't find required message in draft folder. ");

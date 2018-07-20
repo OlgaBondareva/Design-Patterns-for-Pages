@@ -61,8 +61,11 @@ public class MailBox {
         this.driver = driver;
     }
 
-    public void newMail() {
+    public void newMail(String address, String subject, String body) {
         newMailBtn.click();
+        addressField.sendKeys(address);
+        subjectField.sendKeys(subject);
+        bodyField.sendKeys(body);
     }
 
     public void logoff(String name) {
@@ -71,19 +74,11 @@ public class MailBox {
         logoffBtn.click();
     }
 
-    public void setLogin(String value) {
-        loginField.sendKeys(value);
-    }
-
-    public void setPassword(String value) {
-        passField.sendKeys(value);
-    }
-
     public boolean login(String login, String pass) {
         String curURL = driver.getCurrentUrl();
         loginBtn.click();
-        setLogin(login);
-        setPassword(pass);
+        loginField.sendKeys(login);
+        passField.sendKeys(pass);
         loginCheckBox.click();
         logBtn.click();
         return !driver.getTitle().equals(curURL);
@@ -118,12 +113,6 @@ public class MailBox {
             }
         }
         return mailFound;
-    }
-
-    public void setMailFields(String address, String subject, String body) {
-        addressField.sendKeys(address);
-        subjectField.sendKeys(subject);
-        bodyField.sendKeys(body);
     }
 
     public void saveToDrafts() {
